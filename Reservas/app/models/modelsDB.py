@@ -8,7 +8,7 @@ class Table(Base):
     __tablename__ = 'tables'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    number = Column(Integer, nullable=False)
+    number = Column(Integer, nullable=False, unique=True)
     seats = Column(Integer, nullable=False)
     is_occupied = Column(Boolean, nullable=False, default=False)
 
