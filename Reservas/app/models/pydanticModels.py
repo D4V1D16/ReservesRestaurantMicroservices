@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List,Optional
+
 
 class TableBase(BaseModel):
     number: int
@@ -13,6 +14,9 @@ class TableCreate(TableBase):
 class Table(TableBase):
     class Config:
         orm_mode = True
+
+class SeatsUpdate(BaseModel):
+    seats : int
 
         
 class CustomerBase(BaseModel):
