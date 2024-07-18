@@ -20,6 +20,7 @@ class SeatsUpdate(BaseModel):
 
         
 class CustomerBase(BaseModel):
+    id : str
     name: str
     email: str
     tel: str = None
@@ -33,6 +34,11 @@ class Customer(CustomerBase):
 
     class Config:
         orm_mode: True
+
+class CustomerUpdate(BaseModel):
+    name: Optional[str]
+    email: Optional[str]
+    tel: Optional[str]
 
 class BookBase(BaseModel):
     table_id: int

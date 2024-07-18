@@ -2,11 +2,11 @@ from fastapi import APIRouter,Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from sqlalchemy import text,delete
+from sqlalchemy import text
 from ..models.pydanticModels import TableCreate,SeatsUpdate
 from ..models.modelsDB import Table
 from ..database.connection import get_session
-from ..models.utilities import pydanticToAlchemy
+from ..models.utilities import pydanticTableToAlchemy
 
 table = APIRouter()
 
@@ -31,10 +31,10 @@ def read_tables(session : Session = Depends(get_session)):
 @table.post("/tables", tags = ['Tables'])
 def add_table(table : TableCreate,session : Session = Depends(get_session)):
     try:
-        table = pydanticToAlchemy(table)
+        table = pydanticTableToAlchemy(table)
         existTable = session.query(Table).filter(Table.number == table.number).first()
         if existTable:
-            return JSONResponse(status_code=400, content={"message":"Ya existe una mesa con ese numero"})
+            return JSONResponse(status_code=409, content={"message":"Ya existe una mesa con ese numero"})
         session.add(table)
         session.commit()
         return JSONResponse(status_code=201, 
@@ -87,7 +87,7 @@ def update_table(tableNumber: int, table_update: SeatsUpdate, session: Session =
     finally: 
         session.close()
 
-@table.get("/tables", tags = ['Tables'])
+@table.get("/tablesFilter", tags = ['Tables'])
 def filter_tables(booleanTable:bool,session : Session = Depends(get_session)):
     try:
         result = session.query(Table).filter(Table.is_occupied == booleanTable)
