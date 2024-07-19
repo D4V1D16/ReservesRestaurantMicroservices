@@ -50,7 +50,7 @@ def add_customer(customer: CustomerCreate, session: Session = Depends(get_sessio
 @customer.get("/customers/{idCustomer}", tags=['Customer'])
 def get_single_client(idCustomer:str,session:Session = Depends(get_session)):
     try:
-        customer = session.query(Customer).filter(Customer.idcustomer == id).first()
+        customer = session.query(Customer).filter(Customer.idcustomer == idCustomer).first()
         if not customer:
             return JSONResponse(status_code=404, content={"message":"No se ha encontrado un cliente con ese ID"})
         customerSerialized = jsonable_encoder(customer)
@@ -61,17 +61,18 @@ def get_single_client(idCustomer:str,session:Session = Depends(get_session)):
         session.close()
     return {"customers": "Obteniendo un solo Cliente"}
 
-@customer.delete("/customers/{id}", tags=['Customer'])
-def add_customer(id:str,session:Session = Depends(get_session)):
+@customer.delete("/customers/{idCustomer}", tags=['Customer'])
+def delete_customer(idCustomer: str, session: Session = Depends(get_session)):
     try:
-        customer = session.query(Customer).filter(Customer.id == id).first()
+        customer = session.query(Customer).filter(Customer.idcustomer == idCustomer).first()
         if not customer:
-            return JSONResponse(status_code=404, content={"message":"No se ha encontrado un cliente con ese ID"})
+            return JSONResponse(status_code=404, content={"message": "No se ha encontrado un cliente con ese ID"})
         session.delete(customer)
         session.commit()
-        return JSONResponse(status_code=204, content={"message":"Cliente eliminado con exito"})
+        return JSONResponse(status_code=204,content={"message": "Cliente eliminado con exito"})
     except Exception as e:
-        return JSONResponse(status_code=500, content={"message": f"Ha ocurrido un error: {str(e)}"})
+        error_message = {"message": f"Ha ocurrido un error: {str(e)}"}
+        return JSONResponse(status_code=500, content=error_message)
     finally:
         session.close()
 

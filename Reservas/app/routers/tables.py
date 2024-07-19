@@ -66,7 +66,7 @@ def delete_table(tableNumber : int, session : Session = Depends(get_session)):
             return JSONResponse(status_code=404, content={"message":"No se ha encontrado una mesa con ese numero"})
         session.delete(table)
         session.commit()
-        return JSONResponse(status_code=200, content={"message":"Mesa borrada con exito"})
+        return JSONResponse(status_code=204)
     except Exception as e:
         return JSONResponse(status_code=500, content={"message":f"Ha ocurrido un error: {str(e)}"})
 
