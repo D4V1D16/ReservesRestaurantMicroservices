@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from ..models.pydanticModels import TableCreate,SeatsUpdate
-from ..models.modelsDB import Table
-from ..database.connection import get_session
-from ..models.utilities import pydanticTableToAlchemy
+from app.models.pydanticModels import TableCreate,SeatsUpdate
+from app.models.modelsDB import Table
+from app.database.connection import get_session
+from app.models.utilities import pydanticTableToAlchemy
 
 table = APIRouter()
 

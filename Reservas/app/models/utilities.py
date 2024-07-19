@@ -1,5 +1,6 @@
-from .pydanticModels import TableCreate,CustomerCreate
-from .modelsDB import Table,Customer
+from app.models.pydanticModels import TableCreate, CustomerCreate
+from app.models.modelsDB import Table,Customer
+
 def pydanticTableToAlchemy(table:TableCreate):
     return Table(
         number=table.number,
@@ -8,12 +9,10 @@ def pydanticTableToAlchemy(table:TableCreate):
     )
 
 
-def pydanticCustomerToAlchemy(cust:CustomerCreate):
-    return Customer(
+def pydanticCustomerToAlchemy(cust: CustomerCreate):
+    return Customer(  
+        idcustomer=cust.IDCustomer,
         name=cust.name,
         email=cust.email,
         tel=cust.tel
     )
-
-
-

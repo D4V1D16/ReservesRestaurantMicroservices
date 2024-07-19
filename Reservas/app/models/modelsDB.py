@@ -29,7 +29,7 @@ class Customer(Base):
     __tablename__ = 'customers'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    idCust = Column(String(10), nullable=False, unique=True)
+    idcustomer = Column(String(10), nullable=False, unique=True)
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False,unique=True)
     tel = Column(String(20))

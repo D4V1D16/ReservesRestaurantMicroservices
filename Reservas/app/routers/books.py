@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from sqlalchemy import select
-from ..models.pydanticModels import Book
+from app.models.pydanticModels import Book
 
 book = APIRouter()
 

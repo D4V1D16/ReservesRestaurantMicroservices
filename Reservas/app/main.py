@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routers import tables,books,customer
-from .database.connection import migration
+
+
 
 app = FastAPI(
     title="Reservas de Mesas",
@@ -13,9 +14,8 @@ app = FastAPI(
     ]
 )
 
-#Funcion que realiza migraciones automaticamente siempre que realicemos una migracion
 
-migration()
+
 
 
 app.include_router(tables.table)

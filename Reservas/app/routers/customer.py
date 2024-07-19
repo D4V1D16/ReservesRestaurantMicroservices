@@ -3,9 +3,10 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from ..models.pydanticModels import CustomerCreate,Customer,CustomerUpdate
-from ..models.utilities import pydanticCustomerToAlchemy
-from ..database.connection import get_session
+from app.models.pydanticModels import CustomerCreate,CustomerPydantic,CustomerUpdate
+from app.models.modelsDB import Customer
+from app.models.utilities import pydanticCustomerToAlchemy
+from app.database.connection import get_session
 
 customer = APIRouter()
 
@@ -29,28 +30,27 @@ def read_customers(session : Session = Depends(get_session)):
 
 
 @customer.post("/customers", tags=['Customer'])
-def add_customer(customer : CustomerCreate,session : Session = Depends(get_session)):
+def add_customer(customer: CustomerCreate, session: Session = Depends(get_session)):
     try:
-        customer_obj = pydanticCustomerToAlchemy(customer)
-        existCustomer = session.query(Customer).filter(Customer.id == customer_obj)
+        customer = pydanticCustomerToAlchemy(customer)
+        existCustomer = session.query(Customer).filter(Customer.idcustomer == customer.idcustomer).first()
         if existCustomer:
             return JSONResponse(status_code=409, content={"message":"Ya existe un cliente con ese ID"})
-        session.add(customer_obj)
+        session.add(customer)
         session.commit()
         return JSONResponse(status_code=201, 
-                            content={
-                                "message":"Cliente creado con exito",
-                                "cliente":customer_obj.id})
+                            content={"message":"Cliente creado con exito",
+                            "customer":{"idCustomer":customer.idcustomer,"name":customer.name,"email":customer.email,"tel":customer.tel}})
     except Exception as e:
-        return JSONResponse(status_code=500, content={"message": f"Ha ocurrido un error: {str(e)}"})
+        return JSONResponse(status_code=500, content={"message":f"Ha ocurrido un error: {str(e)}"})
     finally:
         session.close()
 
 
-@customer.get("/customers/{id}", tags=['Customer'])
-def get_single_client(id:int,session:Session = Depends(get_session)):
+@customer.get("/customers/{idCustomer}", tags=['Customer'])
+def get_single_client(idCustomer:str,session:Session = Depends(get_session)):
     try:
-        customer = session.query(Customer).filter(Customer.id == id).first()
+        customer = session.query(Customer).filter(Customer.idcustomer == id).first()
         if not customer:
             return JSONResponse(status_code=404, content={"message":"No se ha encontrado un cliente con ese ID"})
         customerSerialized = jsonable_encoder(customer)
@@ -62,7 +62,7 @@ def get_single_client(id:int,session:Session = Depends(get_session)):
     return {"customers": "Obteniendo un solo Cliente"}
 
 @customer.delete("/customers/{id}", tags=['Customer'])
-def add_customer(id:int,session:Session = Depends(get_session)):
+def add_customer(id:str,session:Session = Depends(get_session)):
     try:
         customer = session.query(Customer).filter(Customer.id == id).first()
         if not customer:
