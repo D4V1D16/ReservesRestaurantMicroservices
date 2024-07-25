@@ -1,3 +1,4 @@
+from typing import Union
 from fastapi import APIRouter,Depends,Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -102,38 +103,46 @@ def get_single_client(idCustomer:str,session:Session = Depends(get_session)) -> 
 
 
 @customer.delete("/customers/{idCustomer}", tags=['Customer'])
-def delete_customer(idCustomer: str, session: Session = Depends(get_session)) -> Union[Response, JSONResponse]:
+def delete_customer(id_customer: str, session: Session = Depends(get_session)) -> Union[Response, JSONResponse]:
     """
     Delete a customer from the database by their ID.
 
     Parameters:
-    idCustomer (str): The ID of the customer to delete.
+    id_customer (str): The ID of the customer to delete.
     session (Session): A database session object provided by FastAPI Depends.
 
     Returns:
-    Union[Response, JSONResponse]: A FastAPI Response object with a status code of 204 if successful, or a JSON response with an error message.
+    Union[Response, JSONResponse]: A FastAPI Response object with a status code of 204 if successful, 
+    or a JSON response with an error message.
     """
     try:
-        customer = session.query(Customer).filter(Customer.idcustomer == idCustomer).first()
-        if not customer:
-            return JSONResponse(status_code=404, content={"message": "No se ha encontrado un cliente con ese ID"})
+        find_customer = session.query(Customer).filter(Customer.idcustomer == id_customer).first()
+
+        if not find_customer:
+            return JSONResponse(status_code=404, content={
+                "message": "No se ha encontrado un cliente con ese ID"
+                })
+        
         session.delete(customer)
         session.commit()
+
         return Response(status_code=204)
+    
     except Exception as e:
         error_message = {"message": f"Ha ocurrido un error: {str(e)}"}
         return JSONResponse(status_code=500, content=error_message)
+    
     finally:
         session.close()
 
 
 @customer.put("/customers/{idCustomer}", tags=['Customer'])
-def update_customer(idCustomer:str, customer_upd:CustomerUpdate,session : Session = Depends(get_session)) -> JSONResponse:
+def update_customer(id_customer:str, customer_upd:CustomerUpdate,session : Session = Depends(get_session)) -> JSONResponse:
     """
     Update an existing customer in the database.
 
     Parameters:
-    idCustomer (str): The ID of the customer to update.
+    id_customer (str): The ID of the customer to update.
     customer_upd (CustomerUpdate): A Pydantic model representing the updated customer.
     session (Session): A database session object provided by FastAPI Depends.
 
@@ -141,17 +150,21 @@ def update_customer(idCustomer:str, customer_upd:CustomerUpdate,session : Sessio
     JSONResponse: A JSON response with a success message.
     """
     try:
-        customer = session.query(Customer).filter(Customer.idcustomer == idCustomer).first()
-        if not customer:
+        find_customer = session.query(Customer).filter(Customer.idcustomer == id_customer).first()
+        if not find_customer:
             return JSONResponse(status_code=404, content={"message":"No se ha encontrado un cliente con ese ID"})
+        
         for key,value in dict(customer_upd).items():
             setattr(customer, key, value)
 
         session.commit()
         session.refresh(customer)
+
         return JSONResponse(status_code=200, content={"message": "Cliente actualizado con exito"})
+    
     
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"Ha ocurrido un error: {str(e)}"})
+    
     finally:
         session.close()

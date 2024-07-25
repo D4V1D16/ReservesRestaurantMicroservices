@@ -12,6 +12,15 @@ book = APIRouter()
 
 @book.get('/books', tags=['Books'])
 def get_books(session : Session = Depends(get_session)):
+    """
+    Retrieve all book reservations.
+
+    Parameters:
+    session (Session): A database session object provided by FastAPI Depends.
+
+    Returns:
+    dict: A dictionary containing a list of all book reservations.
+    """
     try:
         result = session.execute(text("SELECT * FROM books"))
         column_names = [desc[0] for desc in result.cursor.description]
@@ -30,6 +39,16 @@ def get_books(session : Session = Depends(get_session)):
 
 @book.post('/books', tags=['Books'])
 def add_book(book_data: BookCreate, session: Session = Depends(get_session)):
+    """
+    Add a new book reservation.
+
+    Parameters:
+    book_data (BookCreate): A Pydantic model representing the new book reservation data.
+    session (Session): A database session object provided by FastAPI Depends.
+
+    Returns:
+    JSONResponse: A JSON response with a success message and the created book reservation data.
+    """
     try:
         table_exist = session.query(Table).filter(Table.number == book_data.table_number).first()
         customer_exist = session.query(Customer).filter(Customer.idcustomer == book_data.customer_id).first()
@@ -64,6 +83,16 @@ def add_book(book_data: BookCreate, session: Session = Depends(get_session)):
 
 @book.get('/books/{book_id}', tags=['Books'])
 def get_single_book(book_id: int, session: Session = Depends(get_session)):
+    """
+    Retrieve a single book reservation by its ID.
+
+    Parameters:
+    book_id (int): The ID of the book reservation.
+    session (Session): A database session object provided by FastAPI Depends.
+
+    Returns:
+    JSONResponse: A JSON response with a success message and the requested book reservation data.
+    """
     try:
         get_book = session.query(Book).filter(Book.id == book_id).first()
         if not get_book:
@@ -78,6 +107,16 @@ def get_single_book(book_id: int, session: Session = Depends(get_session)):
 
 @book.delete('/books/{book_id}', tags=['Books'])
 def delete_book(book_id: int, session: Session = Depends(get_session)):
+    """
+    Delete a book reservation by its ID.
+
+    Parameters:
+    book_id (int): The ID of the book reservation.
+    session (Session): A database session object provided by FastAPI Depends.
+
+    Returns:
+    Response: A HTTP response with a status code 204 (No Content) if the deletion is successful.
+    """
     try:
         get_book = session.query(Book).filter(Book.id == book_id).first()
         if not get_book:
@@ -93,6 +132,17 @@ def delete_book(book_id: int, session: Session = Depends(get_session)):
 
 @book.put('/books/{book_id}', tags=['Books'])
 def update_book(book_id: int,book_upd:BookUpdate, session: Session = Depends(get_session)):
+    """
+    Update a book reservation by its ID.
+
+    Parameters:
+    book_id (int): The ID of the book reservation.
+    book_upd (BookUpdate): A Pydantic model representing the updated book reservation data.
+    session (Session): A database session object provided by FastAPI Depends.
+
+    Returns:
+    JSONResponse: A JSON response with a success message if the update is successful.
+    """
     try:
         get_book = session.query(Book).filter(Book.id == book_id).first()
         if not get_book:
