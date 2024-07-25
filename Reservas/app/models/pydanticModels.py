@@ -1,6 +1,7 @@
-from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
+from pydantic import BaseModel
+
 
 class TableBase(BaseModel):
     number: int
@@ -9,7 +10,7 @@ class TableBase(BaseModel):
 class TableCreate(TableBase):
     pass
 
-class Table(TableBase):
+class PydanticTable(TableBase):
     class Config:
         orm_mode = True
 
@@ -26,7 +27,7 @@ class CustomerCreate(CustomerBase):
     pass
 
 class CustomerPydantic(CustomerBase):
-    reservations: List['Book'] = []
+    reservations: List['PydanticBook'] = []
 
     class Config:
         orm_mode = True
@@ -38,17 +39,24 @@ class CustomerUpdate(BaseModel):
     tel: Optional[str]
 
 class BookBase(BaseModel):
-    table_id: int
+    table_number: int
     customer_id: str
     time: datetime
 
 class BookCreate(BookBase):
     pass
 
-class Book(BookBase):
+class PydanticBook(BookBase):
     id: int
-    table: Table  
+    table: PydanticTable  
     customer: CustomerPydantic  
+
+
+class BookUpdate(BaseModel):
+    table_number: Optional[int] = None
+    customer_id: Optional[str] = None
+    time: Optional[datetime] = None
+
 
     class Config:
         orm_mode = True

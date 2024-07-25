@@ -20,7 +20,7 @@ def pydanticCustomerToAlchemy(cust: CustomerCreate):
 
 def pydanticBookToAlchemy(book : BookCreate):
     return Book(
-        table_number=book.table_id,
+        table_number=book.table_number,
         customer_id=book.customer_id,
         time=book.time  
     )
