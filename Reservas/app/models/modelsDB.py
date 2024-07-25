@@ -18,8 +18,8 @@ class Book(Base):
     __tablename__ = 'books'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    table_id = Column(Integer, ForeignKey('tables.id'), nullable=False)
-    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
+    table_number = Column(Integer, ForeignKey('tables.number'), nullable=False)
+    customer_id = Column(String(10), ForeignKey('customers.idcustomer'), nullable=False)
     time = Column(DateTime, nullable=False)
 
     table = relationship("Table", back_populates="reservations")

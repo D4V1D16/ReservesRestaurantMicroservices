@@ -1,6 +1,4 @@
 ven
 ReservesCollection
-app/__pycache__
-app/database/__pycache__
-app/models/__pycache__
-
+**/__pycache__/
+app/database/connection.py

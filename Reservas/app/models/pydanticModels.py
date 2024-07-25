@@ -39,7 +39,7 @@ class CustomerUpdate(BaseModel):
 
 class BookBase(BaseModel):
     table_id: int
-    customer_id: int
+    customer_id: str
     time: datetime
 
 class BookCreate(BookBase):

@@ -1,9 +1,9 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter,Depends,Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.models.pydanticModels import CustomerCreate,CustomerPydantic,CustomerUpdate
+from app.models.pydanticModels import CustomerCreate,CustomerUpdate
 from app.models.modelsDB import Customer
 from app.models.utilities import pydanticCustomerToAlchemy
 from app.database.connection import get_session
@@ -69,26 +69,28 @@ def delete_customer(idCustomer: str, session: Session = Depends(get_session)):
             return JSONResponse(status_code=404, content={"message": "No se ha encontrado un cliente con ese ID"})
         session.delete(customer)
         session.commit()
-        return JSONResponse(status_code=204,content={"message": "Cliente eliminado con exito"})
+        return Response(status_code=204)
     except Exception as e:
         error_message = {"message": f"Ha ocurrido un error: {str(e)}"}
         return JSONResponse(status_code=500, content=error_message)
     finally:
         session.close()
 
-@customer.put("/customers/{id}", tags=['Customer'])
-def update_customer(id:int, customer_upd:CustomerUpdate,session : Session = Depends(get_session)):
+@customer.put("/customers/{idCustomer}", tags=['Customer'])
+def update_customer(idCustomer:str, customer_upd:CustomerUpdate,session : Session = Depends(get_session)):
     try:
-        customer = session.query(Customer).filter(Customer.id == id).first()
+        customer = session.query(Customer).filter(Customer.idcustomer == idCustomer).first()
         if not customer:
             return JSONResponse(status_code=404, content={"message":"No se ha encontrado un cliente con ese ID"})
-        for key,value in dict(customer_upd):
+        for key,value in dict(customer_upd).items():
             setattr(customer, key, value)
 
         session.commit()
         session.refresh(customer)
         return JSONResponse(status_code=200, content={"message": "Cliente actualizado con exito"})
+    
     except Exception as e:
-        return JSONResponse(status_code=500, content={"message": f"Ha ocurrido un error: {str(e)}"})
+        print(e)
+        #return JSONResponse(status_code=500, content={"message": f"Ha ocurrido un error: {str(e)}"})
     finally:
         session.close()
